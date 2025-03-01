@@ -1,4 +1,4 @@
-package ink.ptms.adyeshach.impl.specific
+package ink.ptms.adyeshach.impl.nms.specific
 
 import ink.ptms.adyeshach.impl.nms.specific.NMS19p
 import net.minecraft.server.level.PlayerChunkMap
