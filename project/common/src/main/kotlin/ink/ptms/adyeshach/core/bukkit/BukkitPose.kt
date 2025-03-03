@@ -44,6 +44,9 @@ enum class BukkitPose {
      */
     SNEAKING,
 
+    @Deprecated("老逼")
+    CROUCHING,
+
     /**
      * 长跳状态 - 实体进行较长距离跳跃时的姿态
      * 适用于: 玩家(使用山羊角时)、山羊

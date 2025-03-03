@@ -453,7 +453,7 @@ class DefaultMinecraftEntityMetadataHandler : MinecraftEntityMetadataHandler {
                         BukkitPose.SLEEPING -> NMSEntityPose.SLEEPING
                         BukkitPose.SWIMMING -> NMSEntityPose.SWIMMING
                         BukkitPose.SPIN_ATTACK -> NMSEntityPose.SPIN_ATTACK
-                        BukkitPose.SNEAKING -> NMSEntityPose.CROUCHING
+                        BukkitPose.SNEAKING, BukkitPose.CROUCHING -> NMSEntityPose.CROUCHING
                         BukkitPose.DYING -> NMSEntityPose.DYING
                         BukkitPose.LONG_JUMPING -> NMSEntityPose.LONG_JUMPING
                         BukkitPose.CROAKING -> NMSEntityPose.CROAKING
@@ -477,7 +477,7 @@ class DefaultMinecraftEntityMetadataHandler : MinecraftEntityMetadataHandler {
                         BukkitPose.SLEEPING -> NMS16EntityPose.SLEEPING
                         BukkitPose.SWIMMING -> NMS16EntityPose.SWIMMING
                         BukkitPose.SPIN_ATTACK -> NMS16EntityPose.SPIN_ATTACK
-                        BukkitPose.SNEAKING -> NMS16EntityPose.CROUCHING
+                        BukkitPose.SNEAKING, BukkitPose.CROUCHING -> NMS16EntityPose.CROUCHING
                         BukkitPose.DYING -> NMS16EntityPose.DYING
                         else -> NMS16EntityPose.STANDING
                     }
