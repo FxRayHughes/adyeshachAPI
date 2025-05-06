@@ -6,7 +6,6 @@ import ink.ptms.adyeshach.core.MinecraftPacketHandler
 import org.bukkit.entity.Player
 import taboolib.common.util.unsafeLazy
 import taboolib.module.nms.PacketSender
-import taboolib.module.nms.sendPacket
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 
@@ -19,7 +18,8 @@ import java.util.concurrent.ConcurrentLinkedQueue
  */
 class DefaultMinecraftPacketHandler : MinecraftPacketHandler {
 
-    val buffer = ConcurrentHashMap<Player, ConcurrentLinkedQueue<BufferPacket>>()
+    val buffer = ConcurrentHashMap<Player, ConcurrentLinkedQueue<Any>>()
+    val metaBuffer = ConcurrentHashMap<Player, ConcurrentLinkedQueue<BufferPacket>>()
     val operator by unsafeLazy { Adyeshach.api().getMinecraftAPI().getEntityOperator() }
 
     init {
@@ -27,19 +27,42 @@ class DefaultMinecraftPacketHandler : MinecraftPacketHandler {
     }
 
     override fun sendPacket(player: List<Player>, packet: Any) {
-        player.forEach { it.sendPacket(packet) }
+        player.forEach {
+            buffer.getOrPut(it) { ConcurrentLinkedQueue() }.offer(packet)
+        }
     }
 
     override fun bufferMetadataPacket(player: List<Player>, id: Int, packet: MinecraftMeta) {
         player.forEach {
-            buffer.getOrPut(it) { ConcurrentLinkedQueue() }.offer(BufferPacket(id, packet))
+            metaBuffer.getOrPut(it) { ConcurrentLinkedQueue() }.offer(BufferPacket(id, packet))
         }
     }
 
     override fun flush(player: List<Player>) {
         player.forEach { p ->
-            buffer.remove(p)?.groupBy { it.id }?.forEach { b ->
-                operator.updateEntityMetadata(p, b.key, b.value.map { it.packet })
+            // 处理元数据缓存 - 通过原子交换操作获取并重置队列
+            metaBuffer.computeIfPresent(p) { _, queue ->
+                if (queue.isNotEmpty()) {
+                    // 在替换队列前处理当前队列内容
+                    queue.groupBy { it.id }.forEach { (id, packets) ->
+                        operator.updateEntityMetadata(p, id, packets.map { it.packet })
+                    }
+                }
+                // 返回新的空队列，原子地替换旧队列
+                ConcurrentLinkedQueue()
+            }
+            // 处理普通数据包缓存 - 通过原子交换操作获取并重置队列
+            buffer.computeIfPresent(p) { _, queue ->
+                if (queue.isNotEmpty()) {
+                    // 处理队列中的所有数据包
+                    var packet = queue.poll()
+                    while (packet != null) {
+                        PacketSender.sendPacket(p, packet)
+                        packet = queue.poll()
+                    }
+                }
+                // 返回新的空队列，原子地替换旧队列
+                ConcurrentLinkedQueue()
             }
         }
     }
