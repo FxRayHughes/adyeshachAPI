@@ -6,6 +6,7 @@ import ink.ptms.adyeshach.core.MinecraftPacketHandler
 import org.bukkit.entity.Player
 import taboolib.common.util.unsafeLazy
 import taboolib.module.nms.PacketSender
+import taboolib.module.nms.sendBundlePacket
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 
@@ -40,29 +41,20 @@ class DefaultMinecraftPacketHandler : MinecraftPacketHandler {
 
     override fun flush(player: List<Player>) {
         player.forEach { p ->
-            // 处理元数据缓存 - 通过原子交换操作获取并重置队列
-            metaBuffer.computeIfPresent(p) { _, queue ->
+            // 处理普通数据包缓存
+            buffer.remove(p)?.also { queue ->
+                if (queue.isNotEmpty()) {
+                    p.sendBundlePacket(queue.toList())
+                }
+            }
+            // 处理元数据缓存
+            metaBuffer.remove(p)?.also { queue ->
                 if (queue.isNotEmpty()) {
                     // 在替换队列前处理当前队列内容
                     queue.groupBy { it.id }.forEach { (id, packets) ->
                         operator.updateEntityMetadata(p, id, packets.map { it.packet })
                     }
                 }
-                // 返回新的空队列，原子地替换旧队列
-                ConcurrentLinkedQueue()
-            }
-            // 处理普通数据包缓存 - 通过原子交换操作获取并重置队列
-            buffer.computeIfPresent(p) { _, queue ->
-                if (queue.isNotEmpty()) {
-                    // 处理队列中的所有数据包
-                    var packet = queue.poll()
-                    while (packet != null) {
-                        PacketSender.sendPacket(p, packet)
-                        packet = queue.poll()
-                    }
-                }
-                // 返回新的空队列，原子地替换旧队列
-                ConcurrentLinkedQueue()
             }
         }
     }
