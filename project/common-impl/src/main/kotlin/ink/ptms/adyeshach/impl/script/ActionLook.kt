@@ -26,7 +26,7 @@ private fun actionLook() = combinationParser {
                 errorBy("error-no-manager-or-entity-selected")
             }
             val entities = script.getEntities()
-            if (AdyeshachScriptEvent.Look(entities, smooth != null, x, y, z).call()) {
+            if (AdyeshachScriptEvent.Look(entities, smooth != null, to as? Location, x, y, z).call()) {
                 if (smooth != null) {
                     submitRepeat(5) {
                         entities.forEach { e ->

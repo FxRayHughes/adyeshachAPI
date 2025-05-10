@@ -1,6 +1,7 @@
 package ink.ptms.adyeshach.core.event
 
 import ink.ptms.adyeshach.core.entity.EntityInstance
+import org.bukkit.Location
 import taboolib.platform.type.BukkitProxyEvent
 
 /**
@@ -13,5 +14,5 @@ sealed class AdyeshachScriptEvent(val entity: List<EntityInstance>): BukkitProxy
      * 看向坐标
      * 可以取消来阻止脚本的执行
      */
-    class Look(entity: List<EntityInstance>, val smooth: Boolean, val x: Double?, val y: Double?, val z: Double?) : AdyeshachScriptEvent(entity)
+    class Look(entity: List<EntityInstance>, val smooth: Boolean, val to: Location?, val x: Double?, val y: Double?, val z: Double?) : AdyeshachScriptEvent(entity)
 }
