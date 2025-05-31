@@ -4,6 +4,8 @@ import com.google.gson.annotations.Expose;
 import ink.ptms.adyeshach.core.entity.EntityInstance;
 import ink.ptms.adyeshach.core.entity.StandardTags;
 import ink.ptms.adyeshach.core.entity.controller.Controller;
+import ink.ptms.adyeshach.core.entity.manager.event.ControllerLookEvent;
+import ink.ptms.adyeshach.impl.DefaultAdyeshachAPI;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -103,34 +105,35 @@ public class ControllerLookAtPlayerWithPacket extends Controller {
                 double distance = player.getLocation().distanceSquared(entity.getLocation());
                 if (distance <= lookDistance * lookDistance) {
                     Location entityLoc = entity.getEyeLocation();
-                    Location targetLoc = player.getEyeLocation();
+                    ControllerLookEvent event = new ControllerLookEvent(getEntity(), player, player.getEyeLocation());
+                    if (DefaultAdyeshachAPI.Companion.getLocalEventBus().callControllerLook(event)) {
+                        // 计算朝向向量
+                        Vector direction = event.getLookTarget().toVector().subtract(entityLoc.toVector());
 
-                    // 计算朝向向量
-                    Vector direction = targetLoc.toVector().subtract(entityLoc.toVector());
+                        // 计算 yaw 和 pitch
+                        double x = direction.getX();
+                        double y = direction.getY();
+                        double z = direction.getZ();
 
-                    // 计算 yaw 和 pitch
-                    double x = direction.getX();
-                    double y = direction.getY();
-                    double z = direction.getZ();
+                        // 计算 yaw (水平角度)
+                        double yaw = Math.toDegrees(Math.atan2(-x, z));
+                        // 计算 pitch (垂直角度)
+                        double pitch = Math.toDegrees(Math.asin(-y / direction.length()));
 
-                    // 计算 yaw (水平角度)
-                    double yaw = Math.toDegrees(Math.atan2(-x, z));
-                    // 计算 pitch (垂直角度)
-                    double pitch = Math.toDegrees(Math.asin(-y / direction.length()));
+                        // 如果只需要水平视角，将 pitch 设为 0
+                        if (onlyHorizontal) {
+                            pitch = 0;
+                        }
 
-                    // 如果只需要水平视角，将 pitch 设为 0
-                    if (onlyHorizontal) {
-                        pitch = 0;
+                        // 发送朝向更新包
+                        INSTANCE.api().getMinecraftAPI().getEntityOperator().updateEntityLook(
+                                player,
+                                entity.getIndex(),
+                                (float) yaw,
+                                (float) pitch,
+                                true
+                        );
                     }
-
-                    // 发送朝向更新包
-                    INSTANCE.api().getMinecraftAPI().getEntityOperator().updateEntityLook(
-                            player,
-                            entity.getIndex(),
-                            (float) yaw,
-                            (float) pitch,
-                            true
-                    );
                 }
             }
         }
