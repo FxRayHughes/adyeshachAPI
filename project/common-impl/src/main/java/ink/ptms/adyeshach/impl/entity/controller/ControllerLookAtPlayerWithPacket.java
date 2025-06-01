@@ -13,12 +13,36 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import static ink.ptms.adyeshach.core.Adyeshach.*;
 
 /**
  * 让 NPC 通过数据包看向 "所有玩家"
  */
 public class ControllerLookAtPlayerWithPacket extends Controller {
+
+    public static final Map<String, Map<String, Angle>> LAST_LOOK_ANGLES = new ConcurrentHashMap<>();
+
+    public static class Angle {
+
+        public final double yaw;
+        public final double pitch;
+
+        public Angle(double yaw, double pitch) {
+            this.yaw = yaw;
+            this.pitch = pitch;
+        }
+
+        public double getYaw() {
+            return yaw;
+        }
+
+        public double getPitch() {
+            return pitch;
+        }
+    }
 
     @Expose
     protected final double lookDistance;
@@ -38,6 +62,22 @@ public class ControllerLookAtPlayerWithPacket extends Controller {
         super(entity);
         this.lookDistance = lookDistance;
         this.onlyHorizontal = onlyHorizontal;
+    }
+
+    /**
+     * 获取上次看向角度
+     * 
+     * @param entity 实体实例
+     * @param player 玩家
+     * @return 上次的角度，如果不存在则返回 null
+     */
+    @Nullable
+    public static Angle getLastLookAngle(EntityInstance entity, Player player) {
+        if (entity == null || player == null) {
+            return null;
+        }
+        Map<String, Angle> angles = LAST_LOOK_ANGLES.computeIfAbsent(player.getName(), k -> new ConcurrentHashMap<>());
+        return angles.get(entity.getUniqueId());
     }
 
     @NotNull
@@ -133,6 +173,9 @@ public class ControllerLookAtPlayerWithPacket extends Controller {
                                 (float) pitch,
                                 true
                         );
+                        // 记录最后的朝向角度
+                        LAST_LOOK_ANGLES.computeIfAbsent(player.getName(), k -> new ConcurrentHashMap<>())
+                                .put(entity.getUniqueId(), new Angle(yaw, pitch));
                     }
                 }
             }
@@ -150,4 +193,4 @@ public class ControllerLookAtPlayerWithPacket extends Controller {
     public String toString() {
         return id() + ":" + String.format("%.2f", lookDistance) + "," + onlyHorizontal;
     }
-} 
+}
