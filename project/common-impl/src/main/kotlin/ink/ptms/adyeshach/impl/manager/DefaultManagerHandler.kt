@@ -68,18 +68,20 @@ internal object DefaultManagerHandler {
                     manager.activeEntity.forEach {
                         it as DefaultEntityInstance
                         append("     ${it.id} (${it.entityType}): ${it.getLocation()}\n")
-                        append("     Passengers:")
-                        val pt = measureTime {
-                            it.passengers.forEach { p ->
-                                val find = manager.getEntityByUniqueId(p)
-                                if (find == null) {
-                                    append("     - $p")
-                                } else {
-                                    append("     - $p (${find.id}, ${find.entityType}: ${find.getLocation()})")
+                        if (it.passengers.isNotEmpty()) {
+                            append("     Passengers:")
+                            val pt = measureTime {
+                                it.passengers.forEach { p ->
+                                    val find = manager.getEntityByUniqueId(p)
+                                    if (find == null) {
+                                        append("     - $p\n")
+                                    } else {
+                                        append("     - $p (${find.id}, ${find.entityType}: ${find.getLocation()})\n")
+                                    }
                                 }
                             }
+                            append("     Passenger calculation time: $pt\n")
                         }
-                        append("     Passenger calculation time: $pt\n")
                     }
                     append("-- End of Manager Details --\n")
                 }
