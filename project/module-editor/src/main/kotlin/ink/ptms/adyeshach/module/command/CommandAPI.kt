@@ -184,6 +184,17 @@ object CommandAPI {
         }
     }
 
+    /**
+     * 刷新公共
+     */
+    @CommandBody
+    val refreshPublic = subCommand {
+        execute<Player> { sender, _, _ ->
+            Adyeshach.api().refreshPublicEntityManager()
+            sender.sendMessage("${ADYESHACH_PREFIX}Refreshed.")
+        }
+    }
+
     fun uploadSkin(sender: CommandSender, name: String, model: AdyeshachNetworkAPI.SkinModel) {
         if (uploading) {
             sender.sendMessage("${ADYESHACH_PREFIX}Currently uploading, please wait.")

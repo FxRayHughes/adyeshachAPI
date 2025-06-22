@@ -224,7 +224,7 @@ internal fun ModelEngine.createModel() {
     entity.isDetectingPlayers = false
     entity.bodyRotationController.yBodyRot = entity.location.yaw
     // 销毁原版实体
-    despawn()
+    // despawn()
     // 创建模型
     ModelEngineAPI.createModeledEntity(entity) { model ->
         model.isBaseEntityVisible = false
