@@ -38,4 +38,13 @@ sealed class AdyeshachScriptEvent {
         val y: Double?,
         val z: Double?,
     ) : BukkitProxyEvent()
+
+    /**
+     * 传送
+     */
+    class Teleport(
+        val entity: List<EntityInstance>,
+        val sender: Player?,
+        val to: Location
+    ) : BukkitProxyEvent()
 }
