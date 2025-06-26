@@ -29,7 +29,7 @@ import kotlin.time.measureTime
  * @since 2022/8/18 10:51
  */
 @OptIn(ExperimentalTime::class)
-internal object DefaultManagerHandler {
+object DefaultManagerHandler {
 
     // 当前游戏刻的玩家列表
     var playersInGameTick: Collection<Player> = listOf()
@@ -51,6 +51,10 @@ internal object DefaultManagerHandler {
                 Detailed information has been output to the dump/${player.name}.log file, please check it out!
             """.t()
         )
+        dump(player)
+    }
+
+    fun dump(player: Player) {
         val manager = DefaultAdyeshachAPI.playerEntityTemporaryManagerMap[player.name]!!
         warning("-- Manager Details --")
         warning("   Active entities: ${manager.activeEntity.size}")
