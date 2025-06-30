@@ -69,6 +69,21 @@ interface EntityInstance : EntityBase, Controllable, GenericEntity, Rideable, Vi
     var vehicleSync: Long
 
     /**
+     * 是否启用客户端 ID 对应表
+     */
+    var useClientEntityMap: Boolean
+
+    /**
+     * 是否允许生成时覆盖视角
+     */
+    var isRotationFixOnSpawn: Boolean
+
+    /**
+     * 是否允许生成时刷新 Passenger
+     */
+    var isPassengerRefreshOnSpawn: Boolean
+
+    /**
      * 取决于是否被公开的单位管理器管理
      */
     fun isPublic(): Boolean

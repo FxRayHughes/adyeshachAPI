@@ -5,6 +5,7 @@ import ink.ptms.adyeshach.core.entity.EntityInstance;
 import ink.ptms.adyeshach.core.entity.StandardTags;
 import ink.ptms.adyeshach.core.entity.controller.Controller;
 import ink.ptms.adyeshach.core.entity.manager.event.ControllerLookEvent;
+import ink.ptms.adyeshach.core.util.YawFixerKt;
 import ink.ptms.adyeshach.impl.DefaultAdyeshachAPI;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -164,12 +165,12 @@ public class ControllerLookAtPlayerWithPacket extends Controller {
                         if (onlyHorizontal) {
                             pitch = 0;
                         }
-
+                        float fixYaw = YawFixerKt.fixYaw(entity.getEntityType(), (float) yaw);
                         // 发送朝向更新包
                         INSTANCE.api().getMinecraftAPI().getEntityOperator().updateEntityLook(
                                 player,
                                 entity.getIndex(),
-                                (float) yaw,
+                                fixYaw,
                                 (float) pitch,
                                 true
                         );
