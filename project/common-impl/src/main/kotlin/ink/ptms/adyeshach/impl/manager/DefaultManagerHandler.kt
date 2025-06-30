@@ -1,6 +1,7 @@
 package ink.ptms.adyeshach.impl.manager
 
 import ink.ptms.adyeshach.core.Adyeshach
+import ink.ptms.adyeshach.core.entity.StandardTags
 import ink.ptms.adyeshach.impl.DefaultAdyeshachAPI
 import ink.ptms.adyeshach.impl.DefaultAdyeshachBooster
 import ink.ptms.adyeshach.impl.entity.DefaultEntityInstance
@@ -56,9 +57,11 @@ object DefaultManagerHandler {
 
     fun dump(player: Player) {
         val manager = DefaultAdyeshachAPI.playerEntityTemporaryManagerMap[player.name]!!
+        val activeEntity = manager.activeEntity.sortedBy { it.id }
         warning("-- Manager Details --")
-        warning("   Active entities: ${manager.activeEntity.size}")
-        val passengers = manager.activeEntity.sumOf { (it as DefaultEntityInstance).passengers.size }
+        warning("   Active entities: ${activeEntity.size}")
+        warning("   Visible entities: ${activeEntity.count { it.isVisibleViewer(player) }}")
+        val passengers = activeEntity.sumOf { (it as DefaultEntityInstance).passengers.size }
         warning("   Passengers: $passengers")
         warning("-- End of Manager Details --")
         // 输出到文件
@@ -66,12 +69,19 @@ object DefaultManagerHandler {
             newFile(getDataFolder().resolve("dump/${player.name}.log")).writeText(
                 buildString {
                     append("-- Manager Details --\n")
-                    append("   Active entities: ${manager.activeEntity.size}\n")
+                    append("   Visible entities: ${activeEntity.count { it.isVisibleViewer(player) }}\n")
+                    activeEntity.forEach {
+                        if (it.isVisibleViewer(player)) {
+                            it as DefaultEntityInstance
+                            append("     ${it.id} (${it.entityType}, ${it.getTag(StandardTags.DERIVED)}): ${it.getLocation()}\n")
+                        }
+                    }
+                    append("   Active entities: ${activeEntity.size}\n")
                     append("   Passengers: $passengers\n")
                     append("   Entities: \n")
-                    manager.activeEntity.forEach {
+                    activeEntity.forEach {
                         it as DefaultEntityInstance
-                        append("     ${it.id} (${it.entityType}): ${it.getLocation()}\n")
+                        append("     ${it.id} (${it.entityType}, Visible: ${it.isVisibleViewer(player)}): ${it.getLocation()}\n")
                         if (it.passengers.isNotEmpty()) {
                             append("     Passengers:")
                             val pt = measureTime {
