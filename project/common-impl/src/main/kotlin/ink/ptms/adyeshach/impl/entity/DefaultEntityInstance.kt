@@ -226,6 +226,8 @@ abstract class DefaultEntityInstance(entityType: EntityTypes = EntityTypes.ZOMBI
 
     override var isPassengerRefreshOnSpawn = true
 
+    override var isDisableVisibleEvent = false
+
     /** 插值定位 */
     override var moveFrames: InterpolatedLocation? = null
         set(value) {
@@ -328,7 +330,7 @@ abstract class DefaultEntityInstance(entityType: EntityTypes = EntityTypes.ZOMBI
     }
 
     override fun prepareSpawn(viewer: Player, spawn: Runnable): Boolean {
-        if (AdyeshachEntityVisibleEvent(this, viewer, true).call()) {
+        if (isDisableVisibleEvent || AdyeshachEntityVisibleEvent(this, viewer, true).call()) {
             // 使用事件系统控制实体显示
             if (DefaultAdyeshachAPI.localEventBus.callSpawn(this, viewer)) {
                 spawn.run()
@@ -337,7 +339,9 @@ abstract class DefaultEntityInstance(entityType: EntityTypes = EntityTypes.ZOMBI
             // 更新单位属性
             updateEntityMetadata(viewer)
             // 更新单位视角
-            setHeadRotation(position.yaw, position.pitch, forceUpdate = true)
+            if (isRotationFixOnSpawn) {
+                setHeadRotation(position.yaw, position.pitch, forceUpdate = true)
+            }
             // 关联实体初始化
             if (isPassengerRefreshOnSpawn) {
                 submit(delay = 2) { refreshPassenger(viewer) }
@@ -348,7 +352,7 @@ abstract class DefaultEntityInstance(entityType: EntityTypes = EntityTypes.ZOMBI
     }
 
     override fun prepareDestroy(viewer: Player, destroy: Runnable): Boolean {
-        if (AdyeshachEntityVisibleEvent(this, viewer, false).call()) {
+        if (isDisableVisibleEvent || AdyeshachEntityVisibleEvent(this, viewer, false).call()) {
             // 使用事件系统控制实体销毁
             if (DefaultAdyeshachAPI.localEventBus.callDestroy(this, viewer)) {
                 destroy.run()
