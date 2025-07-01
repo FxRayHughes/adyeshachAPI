@@ -22,6 +22,10 @@ open class DefaultPlayerManager(owner: Player) : DefaultManager(), PlayerManager
             return field
         }
 
+    override fun isValid(): Boolean {
+        return owner.isValid
+    }
+
     override fun isPublic(): Boolean {
         return false
     }

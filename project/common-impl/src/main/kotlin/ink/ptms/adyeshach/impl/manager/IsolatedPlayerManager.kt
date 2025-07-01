@@ -22,6 +22,10 @@ open class IsolatedPlayerManager(owner: Player) : BaseManager(), PlayerManager {
             return field
         }
 
+    override fun isValid(): Boolean {
+        return owner.isValid
+    }
+
     override fun isPublic(): Boolean {
         return false
     }

@@ -50,11 +50,11 @@ internal class EntityModeled(val entity: EntityInstance) : Dummy<EntityInstance>
     }
 
     override fun isRemoved(): Boolean {
-        return entity.isRemoved
+        return entity.isRemoved || entity.manager?.isValid() != true
     }
 
     override fun isAlive(): Boolean {
-        return !entity.isRemoved
+        return !isRemoved()
     }
 
     override fun getRenderRadius(): Int {
