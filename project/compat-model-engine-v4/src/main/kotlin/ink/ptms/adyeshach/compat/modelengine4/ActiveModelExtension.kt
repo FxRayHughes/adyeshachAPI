@@ -205,6 +205,7 @@ internal fun onEnd(e: AnimationEndEvent) {
 }
 
 internal fun ModelEngine.createModel() {
+    destroyModelEngine()
     // 获取配置
     val options = modelEngineOptions ?: ModelEngineOptions()
     // 创建模型对象
