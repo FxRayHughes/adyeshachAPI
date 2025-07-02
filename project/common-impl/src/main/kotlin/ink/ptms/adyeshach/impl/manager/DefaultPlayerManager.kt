@@ -23,7 +23,7 @@ open class DefaultPlayerManager(owner: Player) : DefaultManager(), PlayerManager
         }
 
     override fun isValid(): Boolean {
-        return owner.isValid
+        return owner.isOnline
     }
 
     override fun isPublic(): Boolean {

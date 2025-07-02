@@ -23,7 +23,7 @@ open class IsolatedPlayerManager(owner: Player) : BaseManager(), PlayerManager {
         }
 
     override fun isValid(): Boolean {
-        return owner.isValid
+        return owner.isOnline
     }
 
     override fun isPublic(): Boolean {
