@@ -84,10 +84,12 @@ fun DefaultEntityInstance.handleTracker() {
     // 检查间隔
     if (viewPlayers.visibleRefreshLocker.hasNext()) {
         // 同步到载具位置
-        val vehicle = getVehicle()
-        if (vehicle != null) {
-            position = vehicle.position.clone()
-            clientPosition = vehicle.position.clone()
+        if (!isDisableVehicleCheckOnTick) {
+            val vehicle = getVehicle()
+            if (vehicle != null) {
+                position = vehicle.position.clone()
+                clientPosition = vehicle.position.clone()
+            }
         }
         // 同步可见状态
         val entityManager = manager

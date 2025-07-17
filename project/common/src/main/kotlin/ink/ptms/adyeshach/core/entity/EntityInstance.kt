@@ -90,6 +90,12 @@ interface EntityInstance : EntityBase, Controllable, GenericEntity, Rideable, Vi
     var isDisableVisibleEvent: Boolean
 
     /**
+     * 是否在 Tick 中禁用载具检查
+     * 这将会提升性能
+     */
+    var isDisableVehicleCheckOnTick: Boolean
+
+    /**
      * 取决于是否被公开的单位管理器管理
      */
     fun isPublic(): Boolean

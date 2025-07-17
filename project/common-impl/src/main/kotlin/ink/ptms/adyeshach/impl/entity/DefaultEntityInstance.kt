@@ -228,6 +228,8 @@ abstract class DefaultEntityInstance(entityType: EntityTypes = EntityTypes.ZOMBI
 
     override var isDisableVisibleEvent = false
 
+    override var isDisableVehicleCheckOnTick = false
+
     /** 插值定位 */
     override var moveFrames: InterpolatedLocation? = null
         set(value) {
